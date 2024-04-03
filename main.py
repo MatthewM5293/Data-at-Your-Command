@@ -69,18 +69,16 @@ def print_record(record):
 # endregion
 
 
-def ask_for_record(firstname, lastname, phonenumber):
-    isValid = False
-    while not isValid:
-        if verify_record(firstname, lastname, phonenumber):
-            print("Invalid, must fill out all fields")
-        else:
-            isValid = True
-            append_to_database((firstname, lastname, phonenumber))
+def ask_for_record(firstname, lastname, phone_number):
+    if not verify_record(firstname, lastname, phone_number):
+        print("Invalid, must fill out all fields")
+        return
+    else:
+        print('added new record to database')
+        append_to_database((firstname, lastname, phone_number))
 
 
 def ask_field_to_find(type, value):
-    # value = input(f"Enter value you want to {type} (Ex: Matt)\n>>>:: ")
     record = find_in_database(value)
     if record is not None:
         if type == 'find':
@@ -95,11 +93,20 @@ def ask_field_to_find(type, value):
 
 
 # region verify fields
-def verify_record(firstname, lastname, phonenumber):
-    if len(firstname) < 1 or len(lastname) < 1 or len(phonenumber) < 9:
+def verify_record(firstname, lastname, phone_number):
+    if len(firstname) < 1 or len(lastname) < 1 or len(phone_number) < 9:
         return False
     else:
-        if verify_name(firstname) and verify_name(lastname) and verify_phone_number(phonenumber):
+        if not verify_name(firstname):
+            print('First name is invalid')
+            return False
+        elif not verify_name(lastname):
+            print('Last name is invalid')
+            return False
+        elif not verify_phone_number(phone_number):
+            print('Phone number is invalid')
+            return False
+        else:
             return True
 
 
@@ -109,17 +116,17 @@ def verify_name(name):
 
 
 def verify_phone_number(phone_number):
-    pattern = r'^\d{3}-\d{3}-\d{4}$'
+    pattern = r'^(\+\d{1,2}\s?)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$'
     return re.match(pattern, phone_number)
 
 
 def print_database_usage():
     print('Usage:')
     print('add [fname] [lname] [phone]  (add a new contact record)')
-    print('list                                             (list all records)')
-    print('find [value]                               (find and show the first record that matches the search)')
-    print('del [value]                                 (delete the first record that matches the search)')
-    print('quit                                            (quit the CLI)')
+    print('list                         (list all records)')
+    print('find [value]                 (find and show the first record that matches the search)')
+    print('del [value]                  (delete the first record that matches the search)')
+    print('quit                         (quit the CLI)')
 
 
 # endregion
@@ -135,7 +142,6 @@ def startApp():
             match command[0].lower():
                 case inp if inp == 'add' and len(command) == 4:
                     ask_for_record(command[1], command[2], command[3])
-                    print('added new record to database')
                 case inp if inp == 'list':
                     list_database()
                 case inp if inp == 'find' and len(command) == 2:
