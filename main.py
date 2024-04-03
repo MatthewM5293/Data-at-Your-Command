@@ -38,11 +38,11 @@ def find_in_database(record):
     global database
     database = read_database_from_file()
     for element in database:
-        if element[0] == record:
+        if element[0].lower() == record.lower():
             return element
-        if element[1] == record:
+        if element[1].lower() == record.lower():
             return element
-        if element[2] == record:
+        if element[2].lower() == record.lower():
             return element
 
     return
@@ -68,27 +68,19 @@ def print_record(record):
 
 # endregion
 
-def db_options():
-    print("\nWhat would you like to do?")
-    print(" 1) Add record \n 2) List all records\n 3) Find record \n 4) Delete record \n 5) Quit")
 
-
-def ask_for_record():
+def ask_for_record(firstname, lastname, phonenumber):
     isValid = False
     while not isValid:
-        firstname = input("Enter first name>>>:: ").strip()
-        lastname = input("Enter last name>>>:: ").strip()
-        phonenumber = input("Enter phone number>>>:: ").strip()
-        if not verify_record(firstname, lastname, phonenumber):
+        if verify_record(firstname, lastname, phonenumber):
             print("Invalid, must fill out all fields")
         else:
-            print("Thank you for")
             isValid = True
-            return (firstname, lastname, phonenumber)
+            append_to_database((firstname, lastname, phonenumber))
 
 
-def ask_field_to_find(type):
-    value = input(f"Enter value you want to {type} (Ex: Matt)\n>>>:: ")
+def ask_field_to_find(type, value):
+    # value = input(f"Enter value you want to {type} (Ex: Matt)\n>>>:: ")
     record = find_in_database(value)
     if record is not None:
         if type == 'find':
@@ -104,7 +96,7 @@ def ask_field_to_find(type):
 
 # region verify fields
 def verify_record(firstname, lastname, phonenumber):
-    if len(firstname) < 1 or len(lastname) < 1 or len(phonenumber) < 10:
+    if len(firstname) < 1 or len(lastname) < 1 or len(phonenumber) < 9:
         return False
     else:
         if verify_name(firstname) and verify_name(lastname) and verify_phone_number(phonenumber):
@@ -121,37 +113,41 @@ def verify_phone_number(phone_number):
     return re.match(pattern, phone_number)
 
 
+def print_database_usage():
+    print('Usage:')
+    print('add [fname] [lname] [phone]  (add a new contact record)')
+    print('list                                             (list all records)')
+    print('find [value]                               (find and show the first record that matches the search)')
+    print('del [value]                                 (delete the first record that matches the search)')
+    print('quit                                            (quit the CLI)')
+
+
 # endregion
 
 def startApp():
     print("Welcome to the database!")
-    quitapp = False
+    print_database_usage()
     while True:
-        db_options()
         userInput = input()
         try:
-            int_option = int(userInput.strip())
+            command = userInput.strip().split()
 
-            match int_option:
-                case inp if inp == 1:
-                    record = ask_for_record()
-                    append_to_database(record)
-                case inp if inp == 2:
+            match command[0].lower():
+                case inp if inp == 'add' and len(command) == 4:
+                    ask_for_record(command[1], command[2], command[3])
+                    print('added new record to database')
+                case inp if inp == 'list':
                     list_database()
-                case inp if inp == 3:
-                    ask_field_to_find('find')
-                case inp if inp == 4:
-                    ask_field_to_find('delete')
-                case inp if inp == 5:
+                case inp if inp == 'find' and len(command) == 2:
+                    ask_field_to_find('find', command[1])
+                case inp if inp == 'del' and len(command) == 2:
+                    ask_field_to_find('delete', command[1])
+                case inp if inp == 'quit':
                     break
-                case inp if inp > 5:
-                    print('Invalid input! Must be a number from 1 to 5!')
-                case inp if inp <= 0:
-                    print('Invalid input! Must be a number from 1 to 5!')
-
-        except ValueError as ex:
-            print(ex)
-            print("Invalid input! Must be a number.")
+                case _:
+                    print_database_usage()
+        except ValueError:
+            print_database_usage()
 
 
 if __name__ == '__main__':
