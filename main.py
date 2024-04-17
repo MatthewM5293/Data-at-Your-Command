@@ -7,17 +7,17 @@ database = []
 
 def read_database_from_file():
     try:
-        with open("Database/database.json", "r") as f:
+        with open("db.json", "r") as f:
             input = f.read()
             global database
             database = json.loads(input)
     except:
-        write_to_database("")
+        write_to_database([])
     return database
 
 
 def write_to_database(record):
-    with open("Database/database.json", "w") as f:
+    with open("db.json", "w") as f:
         f.write(json.dumps(record, indent=4))
 
 
@@ -30,6 +30,7 @@ def append_to_database(record):
 
 def remove_from_database(record):
     global database
+    print(f'removed {record[0], record[1], record[2]} from database')
     database.remove(record)
     write_to_database(database)
 
@@ -68,13 +69,13 @@ def print_record(record):
 
 # endregion
 
-
+# region UI
 def ask_for_record(firstname, lastname, phone_number):
     if not verify_record(firstname, lastname, phone_number):
         print("Invalid, must fill out all fields")
         return
     else:
-        print('added new record to database')
+        print(f'added {firstname, lastname, phone_number} to database')
         append_to_database((firstname, lastname, phone_number))
 
 
@@ -91,6 +92,8 @@ def ask_field_to_find(type, value):
     else:
         print(f'No instance of "{value}" found in the database')
 
+
+# endregion
 
 # region verify fields
 def verify_record(firstname, lastname, phone_number):
@@ -122,6 +125,7 @@ def verify_phone_number(phone_number):
 
 def print_database_usage():
     print('Usage:')
+    print('cls                          (clears screen)')
     print('add [fname] [lname] [phone]  (add a new contact record)')
     print('list                         (list all records)')
     print('find [value]                 (find and show the first record that matches the search)')
@@ -131,18 +135,18 @@ def print_database_usage():
 
 # endregion
 
-def startApp():
+def start_app():
     print("Welcome to the database!")
     print_database_usage()
     while True:
-        userInput = input()
+        user_input = input('>>')
         try:
-            command = userInput.strip().split()
+            command = user_input.strip().split()
 
             match command[0].lower():
                 case inp if inp == 'add' and len(command) == 4:
                     ask_for_record(command[1], command[2], command[3])
-                case inp if inp == 'list':
+                case inp if (inp == 'list' or inp == 'ls'):
                     list_database()
                 case inp if inp == 'find' and len(command) == 2:
                     ask_field_to_find('find', command[1])
@@ -150,11 +154,14 @@ def startApp():
                     ask_field_to_find('delete', command[1])
                 case inp if inp == 'quit':
                     break
+                case inp if inp == 'cls':
+                    print("\n" * 100)
                 case _:
                     print_database_usage()
-        except ValueError:
+        except:
+            print("Invalid input, please refer to below")
             print_database_usage()
 
 
 if __name__ == '__main__':
-    startApp()
+    start_app()
