@@ -124,6 +124,7 @@ def verify_phone_number(phone_number):
 
 
 def print_database_usage():
+    print()
     print('Usage:')
     print('cls                          (clears screen)')
     print('add [fname] [lname] [phone]  (add a new contact record)')
