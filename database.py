@@ -13,10 +13,10 @@ class Database:
             with open(self.__filename, "r") as f:
                 input = f.read()
                 # global database
-                self.database = json.loads(input)
+                self.__database = json.loads(input)
         except:
             self.__write_to_database([])
-        return self.database
+        return self.__database
 
     def __write_to_database(self, record):
         with open(self.__filename, "w") as f:
@@ -24,20 +24,20 @@ class Database:
 
     def __append_to_database(self, record):
         # global database
-        self.database = self.__read_database_from_file()
-        self.database.append(record)
-        self.__write_to_database(self.database)
+        self.__database = self.__read_database_from_file()
+        self.__database.append(record)
+        self.__write_to_database(self.__database)
 
     def __remove_from_database(self, record):
         # global database
         print(f'removed {record[0], record[1], record[2]} from database')
-        self.database.remove(record)
-        self.__write_to_database(self.database)
+        self.__database.remove(record)
+        self.__write_to_database(self.__database)
 
     def __find_in_database(self, record):
         # global database
-        self.database = self.__read_database_from_file()
-        for element in self.database:
+        self.__database = self.__read_database_from_file()
+        for element in self.__database:
             if element[0].lower() == record.lower():
                 return element
             if element[1].lower() == record.lower():
@@ -49,12 +49,12 @@ class Database:
 
     def list_database(self):
         # global database
-        self.database = self.__read_database_from_file()
-        if not self.database:
+        self.__database = self.__read_database_from_file()
+        if not self.__database:
             print("No data in the database, try adding some!")
         else:
             print('listing all records in the database:')
-        for element in self.database:
+        for element in self.__database:
             self.__print_record(element)
 
     def __print_record(self, record):
